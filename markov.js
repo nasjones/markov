@@ -5,7 +5,7 @@ class MarkovMachine {
 	constructor(text) {
 		let words = text.split(/[ \r\n]+/);
 		this.words = words.filter((c) => c !== "");
-		this.makeChains();
+		this.text = this.makeChains();
 	}
 
 	/** set markov chains:
@@ -16,14 +16,13 @@ class MarkovMachine {
 	makeChains() {
 		// TODO
 		this.chains = {};
-		for (let i = 0; i < this.words.length - 1; i++) {
+		for (let i = 0; i < this.words.length; i++) {
 			let current = this.words[i];
-			let next = this.words[i + 1];
-			let word = this.words[i + 2] ? this.words[i + 2] : null;
-			if (this.chains[`${current} ${next}`]) {
-				this.chains[`${current} ${next}`].push(word);
+			let word = this.words[i + 1] ? this.words[i + 1] : null;
+			if (this.chains[`${current}`]) {
+				this.chains[`${current}`].push(word);
 			} else {
-				this.chains[`${current} ${next}`] = [word];
+				this.chains[`${current}`] = [word];
 			}
 		}
 	}
@@ -32,25 +31,30 @@ class MarkovMachine {
 
 	makeText(numWords = 100) {
 		// TODO
-		let output = "";
-		let chains = Object.keys(this.chains);
-		let current = chains[Math.floor(Math.random() * chains.length)];
-		while (output.split(" ").length < numWords) {
-			output += `${current}`;
+		let output = [];
+		let chainKeys = Object.keys(this.chains);
+		let current = chainKeys[Math.floor(Math.random() * chainKeys.length)];
+		while (output.length < numWords) {
+			output.push(current);
 			let follows = this.chains[current];
 			let start = follows[Math.floor(Math.random() * follows.length)];
-			if (start == null) {
-				output += ".";
-				current = chains[Math.floor(Math.random() * chains.length)];
-			} else {
-				let search = chains.filter((key) =>
-					key.startsWith(`${start} `)
-				);
-				current = search[Math.floor(Math.random() * search.length)];
-			}
-			output += " ";
+			current = start ? start : [chainKeys[0]];
+
+			// if (start == null) {
+			// 	current = chains[Math.floor(Math.random() * chains.length)];
+			// } else {
+			// 	// let search = chains.filter((key) =>
+			// 	// 	key.startsWith(`${start} `)
+			// 	// );
+
+			// 	// if (search.length == 0) {
+			// 	// 	output.push(start);
+			// 	// 	search = [chains[0]];
+			// 	// }
+			// 	current = search[Math.floor(Math.random() * search.length)];
+			// }
 		}
-		return output;
+		return output.join(" ");
 	}
 }
 
